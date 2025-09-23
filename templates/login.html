@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="mb-3">Đăng nhập</h4>
+
+        <form method="post" action="{{ url_for('login') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="mb-3">
+    <label class="form-label">Email</label>
+    <input name="email" type="email" autocomplete="username" class="form-control" placeholder="you@sc.local" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Mật khẩu</label>
+    <input type="password" name="password" autocomplete="current-password" class="form-control" placeholder="••••••••" required>
+  </div>
+  <button class="btn btn-primary w-100" type="submit">Đăng nhập</button>
+</form>
+
+        <div class="mt-3 small text-muted">
+          Admin: admin@sc.local / Admin@123<br>
+          Sales: sale01..sale20 / Sale@123<br>
+          Driver: driver_<id>@sc.local / Driver@123 (tạo khi seed)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

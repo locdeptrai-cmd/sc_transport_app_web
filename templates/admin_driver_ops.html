@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Lái xe đón trả (ngày {{ day.isoformat() }})</h4>
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead><tr><th>Tài xế</th><th>Xe</th><th>Số chuyến</th><th>Doanh thu</th><th>Tiền mặt</th></tr></thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>{{ (r.driver.email if r.driver else "-") }}</td>
+            <td>
+              {% if r.car %}
+                {{ r.car.license_plate or r.car.plate or r.car.plate_number or r.car.name or r.car.model or r.car.id }}
+              {% else %}-{% endif %}
+            </td>
+            <td>{{ r.trips }}</td>
+            <td>{{ "{:,.0f}".format(r.revenue or 0) }}</td>
+            <td>{{ "{:,.0f}".format(r.cash or 0) }}</td>
+          </tr>
+          {% endfor %}
+          {% if not rows %}<tr><td colspan="5" class="text-muted">Không có dữ liệu.</td></tr>{% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Sổ thu chi ngày {{ day.isoformat() }}</h4>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Thu (Payments)</h5>
+        <div>Tổng thu: <b>{{ "{:,.0f}".format(total_in or 0) }} ₫</b></div>
+        <div class="table-responsive mt-3">
+          <table class="table table-sm">
+            <thead><tr><th>Trip</th><th>Method</th><th>Amount</th><th>Received at</th><th>Ref</th></tr></thead>
+            <tbody>
+              {% for p in pays %}
+              <tr>
+                <td>#{{ p.trip_id }}</td>
+                <td>{{ p.method or "-" }}</td>
+                <td>{{ "{:,.0f}".format(p.amount or 0) }}</td>
+                <td>{{ p.received_at }}</td>
+                <td>{{ p.reference_code or "-" }}</td>
+              </tr>
+              {% endfor %}
+              {% if not pays %}<tr><td colspan="5" class="text-muted">Không có khoản thu.</td></tr>{% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Chi (Costs)</h5>
+        <div>Tổng chi: <b>{{ "{:,.0f}".format(total_out or 0) }} ₫</b></div>
+        <div class="table-responsive mt-3">
+          <table class="table table-sm">
+            <thead><tr><th>Category</th><th>Amount</th><th>Occurred at</th><th>Notes</th></tr></thead>
+            <tbody>
+              {% for c in costs %}
+              <tr>
+                <td>{{ c.category or "-" }}</td>
+                <td>{{ "{:,.0f}".format(c.amount or 0) }}</td>
+                <td>{{ c.occurred_at }}</td>
+                <td>{{ c.notes or "-" }}</td>
+              </tr>
+              {% endfor %}
+              {% if not costs %}<tr><td colspan="4" class="text-muted">Không có khoản chi.</td></tr>{% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="alert alert-info mt-3">Số dư ngày: <b>{{ "{:,.0f}".format(balance or 0) }} ₫</b></div>
+{% endblock %}

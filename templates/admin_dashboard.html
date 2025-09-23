@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Quản trị – Tổng quan</h3>
+<div class="row g-3">
+  <div class="col-md-2"><div class="card"><div class="card-body"><div>Tổng chuyến</div><h4>{{ total_trips }}</h4></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><div>Tổng doanh thu</div><h4>{{ '{:,.0f}'.format(total_revenue) }}</h4></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><div>Tổng tiền mặt</div><h4>{{ '{:,.0f}'.format(total_cash) }}</h4></div></div></div>
+  <div class="col-md-2"><div class="card"><div class="card-body"><div>Tổng chi phí</div><h4>{{ '{:,.0f}'.format(total_costs) }}</h4></div></div></div>
+  <div class="col-md-2"><div class="card"><div class="card-body"><div>Lợi nhuận ròng</div><h4>{{ '{:,.0f}'.format(net_profit) }}</h4></div></div></div>
+</div>
+{% endblock %}

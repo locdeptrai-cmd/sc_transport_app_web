@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Bảo dưỡng</h4>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Sắp tới</h5>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead><tr><th>Ngày</th><th>Xe</th><th>Odo (km)</th><th>Công việc</th><th>Dự toán</th><th>Ghi chú</th></tr></thead>
+            <tbody>
+              {% for m in upcoming %}
+              <tr>
+                <td>{{ m.scheduled_date }}</td>
+                <td>{{ m.car_id }}</td>
+                <td>{{ m.odometer_km or "-" }}</td>
+                <td>{{ m.task or "-" }}</td>
+                <td>{{ "{:,.0f}".format(m.estimated_cost or 0) }}</td>
+                <td>{{ m.notes or "-" }}</td>
+              </tr>
+              {% endfor %}
+              {% if not upcoming %}<tr><td colspan="6" class="text-muted">Không có lịch.</td></tr>{% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Đã qua</h5>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead><tr><th>Ngày</th><th>Xe</th><th>Odo</th><th>Công việc</th><th>Chi phí</th><th>Ghi chú</th></tr></thead>
+            <tbody>
+              {% for m in past %}
+              <tr>
+                <td>{{ m.scheduled_date }}</td>
+                <td>{{ m.car_id }}</td>
+                <td>{{ m.odometer_km or "-" }}</td>
+                <td>{{ m.task or "-" }}</td>
+                <td>{{ "{:,.0f}".format(m.actual_cost or 0) }}</td>
+                <td>{{ m.notes or "-" }}</td>
+              </tr>
+              {% endfor %}
+              {% if not past %}<tr><td colspan="6" class="text-muted">Không có dữ liệu.</td></tr>{% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+  <div class="card-body">
+    <h5 class="card-title">Chi phí bảo dưỡng gần đây</h5>
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead><tr><th>ID</th><th>Ngày</th><th>Số tiền</th><th>Ghi chú</th></tr></thead>
+        <tbody>
+          {% for c in maint_costs %}
+          <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.occurred_at }}</td>
+            <td>{{ "{:,.0f}".format(c.amount or 0) }}</td>
+            <td>{{ c.notes or "-" }}</td>
+          </tr>
+          {% endfor %}
+          {% if not maint_costs %}<tr><td colspan="4" class="text-muted">Không có chi phí bảo dưỡng.</td></tr>{% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small">Doanh thu hôm nay</div>
+        <div class="h4 mb-0">{{ "{:,.0f}".format(daily_rev or 0) }} ₫</div>
+        <div class="text-muted small">Hoa hồng ~ {{ "{:.0%}".format(commission_rate or 0.05) }} = {{ "{:,.0f}".format(est_commission_daily or 0) }} ₫</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small">Doanh thu tháng</div>
+        <div class="h4 mb-0">{{ "{:,.0f}".format(month_rev or 0) }} ₫</div>
+        <div class="text-muted small">Hoa hồng ước tính = {{ "{:,.0f}".format(est_commission_month or 0) }} ₫</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Form: tạo đơn mới -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Tạo đơn/chuyến mới</h5>
+        <form method="post" action="{{ url_for('sales_trip_new') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label class="form-label">Điểm đón (origin) <span class="text-danger">*</span></label>
+            <input name="origin" class="form-control" placeholder="VD: 123 Lê Lợi, Q.1" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Điểm trả (destination)</label>
+            <input name="destination" class="form-control" placeholder="VD: Sân bay Tân Sơn Nhất">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Báo giá (fare quote)</label>
+            <input name="fare_quote" class="form-control" inputmode="decimal" placeholder="VD: 350000">
+            <div class="form-text">Để trống nếu chưa xác định.</div>
+          </div>
+          <button class="btn btn-primary">Lưu đơn</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bảng: đơn đang chờ -->
+{% if pending_trips %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Đơn đang chờ</h5>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Quote</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in pending_trips %}
+              <tr>
+                <td>#{{ t.id }}</td>
+                <td>{{ t.origin }}</td>
+                <td>{{ t.destination or "-" }}</td>
+                <td>{{ "{:,.0f}".format(t.fare_quote or 0) }}</td>
+                <td><span class="badge bg-secondary">{{ t.status }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="text-muted small">Driver “Start trip” → <code>ongoing</code>, “Finish” → <code>completed</code>.</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

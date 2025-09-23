@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- KPI -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small">Doanh thu hôm nay</div>
+        <div class="h4 mb-0">{{ "{:,.0f}".format(daily_rev or 0) }} ₫</div>
+        <div class="text-muted small">Tiền mặt hôm nay: {{ "{:,.0f}".format(cash_daily or 0) }} ₫</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small">Doanh thu tháng</div>
+        <div class="h4 mb-0">{{ "{:,.0f}".format(month_rev or 0) }} ₫</div>
+        <div class="text-muted small">Tiền mặt tháng: {{ "{:,.0f}".format(cash_month or 0) }} ₫</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Đơn chưa nhận -->
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h5 class="card-title mb-3">Đơn chưa nhận</h5>
+    {% if open_trips %}
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Quote</th>
+            <th class="text-end"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in open_trips %}
+          <tr>
+            <td>#{{ t.id }}</td>
+            <td>{{ t.origin }}</td>
+            <td>{{ t.destination or "-" }}</td>
+            <td>{{ "{:,.0f}".format(t.fare_quote or 0) }}</td>
+            <td class="text-end">
+              <form method="post" action="{{ url_for('driver_claim', trip_id=t.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-primary">Nhận đơn</button>
+              </form>
+              <form method="post" action="{{ url_for('trip_start_existing', trip_id=t.id) }}" class="d-inline ms-1">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-outline-success">Nhận & Bắt đầu</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-muted">Hiện không có đơn chờ.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Đơn của tôi -->
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h5 class="card-title mb-3">Đơn của tôi</h5>
+    {% if my_assigned %}
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Origin → Destination</th>
+            <th>Trạng thái</th>
+            <th>Báo giá</th>
+            <th>Bắt đầu</th>
+            <th>Kết thúc</th>
+            <th class="text-end">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in my_assigned %}
+          <tr>
+            <td>#{{ t.id }}</td>
+            <td>{{ t.origin }} → {{ t.destination or "-" }}</td>
+            <td><span class="badge bg-secondary">{{ t.status }}</span></td>
+            <td>{{ "{:,.0f}".format(t.fare_quote or 0) }}</td>
+            <td>{{ t.started_at or "-" }}</td>
+            <td>{{ t.ended_at or "-" }}</td>
+            <td class="text-end">
+              {% if t.status in ["assigned"] %}
+              <form method="post" action="{{ url_for('trip_start_existing', trip_id=t.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-success">Bắt đầu</button>
+              </form>
+              {% endif %}
+
+              {% if t.status in ["ongoing"] %}
+              <!-- Hoàn tất nhanh (tiền mặt = fare_quote); có thể sửa để nhập tay -->
+              <form method="post" action="{{ url_for('trip_finish', trip_id=t.id) }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="payment_method" value="cash">
+                <input type="hidden" name="payment_ref" value="">
+                <input type="hidden" name="destination" value="{{ t.destination or '' }}">
+                <input type="hidden" name="final_fare" value="{{ t.fare_quote or 0 }}">
+                <input type="hidden" name="cash_collected" value="{{ t.fare_quote or 0 }}">
+                <button class="btn btn-sm btn-outline-primary">Hoàn tất (tiền mặt)</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-muted">Bạn chưa nhận đơn nào.</div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
